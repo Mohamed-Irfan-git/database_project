@@ -3658,7 +3658,7 @@ DELIMITER ;
 
 
 CALL generate_student_academic_report('TG/2023/1704');
---give one student marks  CALL get_student_course_marks('U013', 'ICT1222');
+-- give one student marks  CALL get_student_course_marks('U013', 'ICT1222');
 
 
 
@@ -3706,7 +3706,7 @@ END $$
 DELIMITER ;
 CALL get_student_eligibility('U013', 'ICT1222');
 
-----  one course check final marks and eligibility  CALL get_batch_marks_summary_by_course(''Database Management Systems'');
+--  one course check final marks and eligibility  CALL get_batch_marks_summary_by_course(''Database Management Systems'');
 DELIMITER $$
 
 CREATE PROCEDURE  get_batch_marks_summary_by_course (
@@ -3950,6 +3950,25 @@ CALL create_final_student_report_view();
 -- After calling, you can just do:
  -- SELECT * FROM final_student_report;
 
+
+CREATE OR REPLACE VIEW batch_attendance_summary AS
+SELECT
+    c.course_id,
+    c.name AS course_name,
+    c.academic_year,
+    c.semester,
+    ROUND(AVG(ac.attendance_percentage), 2) AS avg_attendance_percentage,
+    SUM(CASE WHEN ac.attendance_percentage >= 80 AND ac.student_status <> 'Suspended' THEN 1 ELSE 0 END) AS eligible_students,
+    COUNT(*) AS total_students,
+    CONCAT(
+        ROUND(
+            (SUM(CASE WHEN ac.attendance_percentage >= 80 AND ac.student_status <> 'Suspended' THEN 1 ELSE 0 END)/COUNT(*))*100, 2
+        ), '%'
+    ) AS eligible_percentage,
+    SUM(CASE WHEN ac.medical_hours > 0 THEN 1 ELSE 0 END) AS students_with_medical
+FROM attendance_combined ac
+JOIN course c ON c.course_id = ac.course_id
+GROUP BY c.course_id, c.academic_year, c.semester;
 
 
 

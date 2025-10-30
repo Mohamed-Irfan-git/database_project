@@ -48,7 +48,7 @@ END $$
 DELIMITER ;
 
 
-----  one course check final marks and eligibility  CALL get_batch_marks_summary_by_course(''Database Management Systems'');
+----  one course check final marks and eligibility  CALL get_batch_marks_summary_by_course('Database Management Systems');
 
 
 DELIMITER $$
